@@ -149,7 +149,7 @@ console.log(chalk.bold.redBright('Opzione non valida. Inserisci solo 1 o 2.'));
 }
 
 console.info = () => {}
-//console.warn = () => {}
+//console.warn = () =>{}
 const connectionOptions = {
 logger: pino({ level: 'silent' }),
 printQRInTerminal: opcion == '1' ? true : methodCodeQR ? true : false,
