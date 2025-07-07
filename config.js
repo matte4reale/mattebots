@@ -7,7 +7,7 @@ global.botnumber = ""
 global.confirmCode = ""
 
 global.owner = [
-  ['393515533859', '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲', true], // VIETATO ELIMINARE IL CREATORE (se lo fai te ne pentirai)
+  ['393515533859', '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲', true],
   ['xxxxxxxxxx',], // al posto del X metti il tuo numero di telefono
   ['xxxxxxxxxx'],	
   ['xxxxxxxxxx',],
@@ -60,7 +60,6 @@ global.APIKeys = {
   'https://api.itsrose.site': 'Rs-Zeltoria',
   'https://api-xcoders.site': 'Frieren'
 }
-// === FINE: API e chiavi spostate ===
 
 
 global.imagen1 = ['./media/menu1.jpg']
@@ -71,7 +70,7 @@ global.packname = '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭'
 global.author = '𝐌𝐝'
 
 
-global.vs = '5.3'
+global.vs = '6.0'
 
 global.nomebot = '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭'
 

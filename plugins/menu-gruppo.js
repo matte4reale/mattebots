@@ -26,12 +26,12 @@ const handler = async (message, { conn, usedPrefix, command }) => {
 
     const menuText = generateMenuText(usedPrefix, botName, userCount);
 
-    const videoPath = path.join(__dirname, '../menu/edit2.mp4'); 
+    const imagePath = path.join(__dirname, '../menu/onepiece5.jpeg'); 
 
     await conn.sendMessage(
         message.chat,
         {
-            video: { url: videoPath },
+            image: { url: imagePath },
             caption: menuText,
             footer: 'Scegli un menu:',
             buttons: [
@@ -190,9 +190,9 @@ function generateMenuText(prefix, botName, userCount) {
 ┃◈┃• 🤕 *.bonk* (meme)  
 ┃◈┃• 👑 *.autoadmin*  
 ┃◈╰━━━━━━━━━━━━┈⊷  
-┃◈  
+┃◈ 
 ┃◈┃• *𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬:* ${vs}  
-┃◈┃• *𝐂𝐎𝐋𝐋𝐀𝐁: 𝐃𝐑𝐆𝐁* 
+┃◈┃• *𝐂𝐎𝐋𝐋𝐀𝐁: �𝐍𝐄 𝐏𝐈���* 
 ┃◈┃• *𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎:* (.supporto)  
 ┃◈└──────────┈⊷  
 ╰━━━━━━━━━━━━━┈⊷  

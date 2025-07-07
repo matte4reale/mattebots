@@ -28,6 +28,7 @@ const handler = async (m, { conn }) => {
         money: 0, warn: 0, warnlink: 0, 
         muto: false, banned: false, 
         messaggi: 0, blasphemy: 0, 
+        blasphemyCounted: 0, // aggiunto
         command: 0, vittorieSlot: 0, 
         categoria: null, instagram: null, 
         eta: null, genere: null
@@ -75,11 +76,18 @@ const handler = async (m, { conn }) => {
 
     let pic;
     try {
-      pic = await conn.profilePictureUrl(who, 'image');
+      // FIX: usa fetch(pic).then(res => res.arrayBuffer()) per compatibilità
+      const res = await fetch(pic);
+      const arrayBuffer = await res.arrayBuffer();
+      pic = Buffer.from(arrayBuffer);
     } catch (error) {
-      pic = 'https://qu.ax/LoGxD.png'; // Immagine di default
+      // fallback immagine di default
+      const res = await fetch('https://qu.ax/LoGxD.png');
+      const arrayBuffer = await res.arrayBuffer();
+      pic = Buffer.from(arrayBuffer);
     }
 
+    
     // Invia il messaggio con i dati aggiornati
     conn.sendMessage(m.chat, {
       text: `꧁════ ☾︎•✮•☽︎ ════꧂\n` +
@@ -88,6 +96,7 @@ const handler = async (m, { conn }) => {
         ` 🟣 ℝ𝕦𝕠𝕝𝕠: ${ruolo}\n` + 
         ` 🗓️ 𝔼𝕥𝕒̀: ${user.eta ? user.eta + " 𝐚𝐧𝐧𝐢" : "𝐍𝐨𝐧 𝐢𝐦𝐩𝐨𝐬𝐭𝐚𝐭𝐚"}\n` +  
         ` 🚻 𝔾𝕖𝕟𝕖𝕣𝕖: ${emojiGenere}\n` +
+        ` 🤬 𝐁𝐞𝐬𝐭𝐞𝐦𝐦𝐢𝐞: ${user.blasphemy || 0}\n` + // mostra il numero esatto
         `${user.instagram ? ` 🌐 instagram.com/${user.instagram}` : ' 🌐 𝕀𝕟𝕤𝕥𝕒𝕘𝕣𝕒𝕞: 𝐧𝐨𝐧 𝐢𝐦𝐩𝐨𝐬𝐭𝐚𝐭𝐨'}\n` + '> grazie papà Riad\n' +
         `꧁════ ☾︎•✮•☽︎ ════꧂`,
       contextInfo: {
@@ -95,7 +104,7 @@ const handler = async (m, { conn }) => {
         externalAdReply: {
           title: `${user.name || 'Sconosciuto'}`,
           body: `𝒄𝒓𝒆𝒂𝒛𝒊𝒐𝒏𝒆 𝒅𝒊 𝑶𝒏𝒊𝒙🌟`,
-          thumbnail: await (await fetch(pic)).buffer(),
+          thumbnail: pic,
         }
       },
       buttons: [

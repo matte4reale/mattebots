@@ -20,7 +20,7 @@ const handler = async (message, { conn, usedPrefix }) => {
     };
 
     // Invia la foto con il menu e i bottoni
-    const imagePath = './menu/chatunitybot.jpg';
+    const imagePath = './menu/onepiece2.jpeg';
     await conn.sendMessage(message.chat, {
         image: { url: imagePath },
         caption: menuText,
@@ -77,7 +77,7 @@ function generateMenuText(prefix, botName, userCount) {
 ┃◈┃
 ┃◈└───────────┈⊷
 ┃◈┃• *𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬:* ${vs}
-┃◈┃•  𝐂𝐎𝐋𝐋𝐀𝐁: 𝐃𝐑𝐆𝐁
+┃◈┃•  𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄
 ┃◈┃• *𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎:* (.supporto)
 ╰━━━━━━━━━━━━━┈·๏
 `.trim();

@@ -69,7 +69,7 @@ let handler = async (m, { conn, args }) => {
     }
 
     // Scan the image using the API
-    const apiUrl = `https://apis.davidcyriltech.my.id/removebg?url=${encodeURIComponent(imageUrl)}`;
+    const apiUrl = `https://api.popcat.xyz/v2/greyscale?image=${encodeURIComponent(imageUrl)}`;
     const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
 
     if (!response || !response.data) {
@@ -80,18 +80,18 @@ let handler = async (m, { conn, args }) => {
 
     await conn.sendMessage(m.chat, {
       image: imageBuffer,
-      caption: `Sfondo rimosso.\n\n> *Powered by ChatUnity*`
+      caption: `> *Powered by ChatUnity*`
     });
 
   } catch (error) {
-    console.error("Rmbg Error:", error);
+    console.error("Grey Error:", error);
     m.reply(`An error occurred: ${error.response?.data?.message || error.message || "Unknown error"}`);
   }
 };
 
 // Definizione comando per handler.js
-handler.help = ['rmbg'];
+handler.help = ['grey'];
 handler.tags = ['img'];
-handler.command = /^(rrimuovisfondo|removebg)$/i;
+handler.command = /^(grey|greyedit)$/i;
 
 export default handler;

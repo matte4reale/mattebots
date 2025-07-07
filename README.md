@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  <img src="https://i.ibb.co/6RMtRXW0/dragonball.jpg"  style="width: 100%; height: auto; max-width: 400px;">
+  <img src="https://i.ibb.co/9mWwC5PP/Whats-App-Image-2025-07-06-at-23-32-06.jpg"  style="width: 100%; height: auto; max-width: 400px;">
 </p>
 
 <h1 align="center">© ChatUnity-Bot 5.3🤖</h1>

@@ -69,29 +69,29 @@ let handler = async (m, { conn, args }) => {
     }
 
     // Scan the image using the API
-    const apiUrl = `https://apis.davidcyriltech.my.id/removebg?url=${encodeURIComponent(imageUrl)}`;
-    const response = await axios.get(apiUrl, { responseType: "arraybuffer" });
+    const scanUrl = `https://apis.davidcyriltech.my.id/imgscan?url=${encodeURIComponent(imageUrl)}`;
+    const scanResponse = await axios.get(scanUrl);
 
-    if (!response || !response.data) {
-      return m.reply("Error: The API did not return a valid image. Try again later.");
+    if (!scanResponse.data.success) {
+      throw scanResponse.data.message || "Failed to analyze image";
     }
 
-    const imageBuffer = Buffer.from(response.data, "binary");
-
-    await conn.sendMessage(m.chat, {
-      image: imageBuffer,
-      caption: `Sfondo rimosso.\n\n> *Powered by ChatUnity*`
-    });
+    // Format the response
+    await m.reply(
+      `🔍 *Image Analysis Results*\n\n` +
+      `${scanResponse.data.result}\n\n` +
+      `> © Powered by ChatUnity`
+    );
 
   } catch (error) {
-    console.error("Rmbg Error:", error);
-    m.reply(`An error occurred: ${error.response?.data?.message || error.message || "Unknown error"}`);
+    console.error('Image Scan Error:', error);
+    await m.reply(`❌ Error: ${error.message || error}`);
   }
 };
 
 // Definizione comando per handler.js
-handler.help = ['rmbg'];
+handler.help = ['imgscan'];
 handler.tags = ['img'];
-handler.command = /^(rrimuovisfondo|removebg)$/i;
+handler.command = /^(imgscan|scanimg|imagescan|analyzeimg)$/i;
 
 export default handler;

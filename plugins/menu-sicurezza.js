@@ -72,17 +72,17 @@ ${statusList.split('\n').map(line => `┃◈┃• ${line}`).join('\n')}
 ┃◈┃
 ┃◈└───────────┈⊷
 ┃◈┃• *𝑽𝑬𝑹𝑺𝑰𝑶𝑵𝑬:* ${vs}
-┃◈┃•  𝐂𝐎𝐋𝐋𝐀𝐁: 𝐃𝐑𝐆𝐁
+┃◈┃•  𝐂𝐎𝐋𝐋𝐀𝐁: 𝐎𝐍𝐄 𝐏𝐈𝐄𝐂𝐄
 ┃◈┃• *𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎:* (.supporto)
 ╰━━━━━━━━━━━━━┈·๏
 `.trim();
 
   // Percorso dell'immagine
-  const videoPath = path.join(__dirname, '../menu/edit5.mp4');
+  const imagePath = path.join(__dirname, '../menu/onepiece4.jpeg');
 
   // Invia il menu con l'immagine e i bottoni
   await conn.sendMessage(m.chat, {
-    video: { url: videoPath },
+    image: { url: imagePath },
     caption: menuText,
     footer: 'Scegli un menu:',
     buttons: [

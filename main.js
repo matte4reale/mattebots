@@ -1,12 +1,12 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '1';
 import './config.js';
-import './api.js';
 import {createRequire} from 'module';
 import path, {join} from 'path';
 import {fileURLToPath, pathToFileURL} from 'url';
 import {platform} from 'process';
 import * as ws from 'ws';
 import {readdirSync, statSync, unlinkSync, existsSync, readFileSync, rmSync, watch} from 'fs';
+import * as fs from 'fs'
 import yargs from 'yargs';
 import {spawn} from 'child_process';
 import lodash from 'lodash';
@@ -121,7 +121,7 @@ const MethodMobile = process.argv.includes("mobile")
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
 const question = (texto) => new Promise((resolver) => rl.question(texto, resolver))
 
-//Código adaptado para la compatibilidad de ser bot con el código de 8 digitos. Hecho por: https://github.com/GataNina-Li
+//Código adaptato per la compatibilità di ser bot con il codice di 8 digitos. Hecho por: https://github.com/GataNina-Li
 let opcion
 if (methodCodeQR) {
 opcion = '1'
@@ -508,4 +508,5 @@ setInterval(async () => {
   await purgeOldFiles();
  console.log(chalk.cyanBright(`\n╭─────────────────\n│ 𝐀𝐔𝐓𝐎 𝐄𝐋𝐈𝐌𝐈𝐍𝐀𝐙𝐈𝐎𝐍𝐄 𝐎𝐋𝐃𝐅𝐈𝐋𝐄𝐒\n│ ⓘ 𝐀𝐫𝐜𝐡𝐢𝐯𝐢 𝐞𝐥𝐢𝐦𝐢𝐧𝐚𝐭𝐢 𝐜𝐨𝐧 𝐬𝐮𝐜𝐜𝐞𝐬𝐬𝐨. ✅\n╰─────────────···`));
 }, 1000 * 60 * 60);
+_quickTest().catch(console.error);
 _quickTest().catch(console.error);
