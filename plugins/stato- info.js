@@ -9,7 +9,7 @@ let handler = async (message, { conn, participants, groupMetadata }) => {
 ✧ Benvenuto (👑)
 ✧ SoloGruppo (👑)
 ✧ SoloPrivato (👑)
-✧ ModoAdmin (👑)
+✧ soloadmin (👑)
 ✧ Gruppo Ban (👤)
 ✧ Restrict sul bot (👤 -❗️)
 ✧ Anti - Paki (👑)

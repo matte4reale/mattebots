@@ -3,7 +3,7 @@ let handler = m => m
 handler.before = async function (m, {conn, isAdmin, isBotAdmin, isOwner, isROwner, isPrems}) {
 const chat = global.db.data.chats[m.chat]
 if (!m.isGroup) return
-if (chat.modoadmin) return  
+if (chat.soloadmin) return  
 if (isOwner || isROwner || isAdmin || !isBotAdmin || isPrems) return
   
 let user = global.db.data.users[m.sender]

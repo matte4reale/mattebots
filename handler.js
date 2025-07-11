@@ -17,6 +17,9 @@ const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(function (
     resolve()
 }, ms))
 
+// Stato chatbot privato per ogni utente
+global.privateChatbot = global.privateChatbot || {}
+
 /**
  * Handle messages upsert
  * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['messages.upsert']} groupsUpdate 
@@ -84,17 +87,17 @@ export async function handler(chatUpdate) {
                 if (!('antiviewonce' in chat)) chat.antiviewonce = false
                 if (!('antiTraba' in chat)) chat.antiTraba = true
                 if (!('antiArab' in chat)) chat.antiArab = false
-                if (!('modoadmin' in chat)) chat.modoadmin = false
+                if (!('soloadmin' in chat)) chat.soloadmin = false
                 if (!('antiporno' in chat)) chat.antiporno = true
                 if (!isNumber(chat.expired)) chat.expired = 0
                 if (!isNumber(chat.messaggi)) chat.messaggi = 0
                 if (!isNumber(chat.blasphemy)) chat.blasphemy = 0
                 if (!('name' in chat)) chat.name = m.name
                 if (!('name' in chat)) chat.name = this.getName(m.chat)
-                if (!('antivirus' in chat)) chat.antivirus = false; // Aggiunto antivirus
-                if (!('antispamcomandi' in chat)) chat.antispamcomandi = true; // Attivo di default
-                if (!('antibestemmie' in chat)) chat.antibestemmie = false; // Attivo/disattivo anti bestemmie
-                if (!('antibot' in chat)) chat.antibot = false; // Disattivato di default
+                if (!('antivirus' in chat)) chat.antivirus = false; 
+                if (!('antispamcomandi' in chat)) chat.antispamcomandi = true;
+                if (!('antibestemmie' in chat)) chat.antibestemmie = false; 
+                if (!('antibot' in chat)) chat.antibot = false; 
             } else
                 global.db.data.chats[m.chat] = {
                     name: this.getName(m.chat),
@@ -123,7 +126,7 @@ export async function handler(chatUpdate) {
                     antiToxic: false,
                     antiTraba: true,
                     antiArab: true,
-                    modoadmin: false,
+                    soloadmin: false,
                     antiPorno: true,
                     muto: false,
                     expired: 0,
@@ -301,7 +304,7 @@ export async function handler(chatUpdate) {
                         return
                 }
                 let hl = _prefix 
-                let adminMode = global.db.data.chats[m.chat].modoadmin
+                let adminMode = global.db.data.chats[m.chat].soloadmin
                 let mystica = `${plugin.botAdmin || plugin.admin || plugin.group || plugin || noPrefix || hl ||  m.text.slice(0, 1) == hl || plugin.command}`
                 if (adminMode && !isOwner && !isROwner && m.isGroup && !isAdmin && mystica) return   
 
@@ -528,11 +531,12 @@ export async function participantsUpdate({ id, participants, action }) {
                                newsletterJid: '120363259442839354@newsletter',
                                serverMessageId: '', newsletterName: `${nomeDelBot}` },
                                externalAdReply: {
-                                    "title": `${action === 'add' ? '𝐌𝐞𝐬𝐬𝐚𝐠𝐠𝐢𝐨 𝐝𝐢 𝐛𝐞𝐧𝐯𝐞𝐧𝐭𝐨' : '𝐌𝐞𝐬𝐬𝐚𝐠𝐠𝐢𝐨 𝐝𝐢 𝐚𝐝𝐝𝐢𝐨'}`,
-                                    "previewType": "PHOTO", 
-                                    "thumbnailUrl": ``, 
-                                    "thumbnail": apii.data,
-                                    "mediaType": 1
+                                    "title": `${msg}`, 
+ "body": ``, 
+  "previewType": "PHOTO",
+  "thumbnailUrl": ``, 
+  "thumbnail": apii.data,
+  "mediaType": 1
                                 }
                             }
                         }) 
@@ -619,10 +623,10 @@ global.dfail = (type, m, conn) => {
         mods: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐥𝐨 𝐩𝐨𝐬𝐬𝐨𝐧𝐨 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐞 𝐬𝐨𝐥𝐨 𝐚𝐝𝐦𝐢𝐧 𝐞 𝐨𝐰𝐧𝐞𝐫 ⚙️',
         premium: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐦𝐞𝐦𝐛𝐫𝐢 𝐩𝐫𝐞𝐦𝐢𝐮𝐦 ✅',
         group: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐮𝐧 𝐠𝐫𝐮𝐩𝐩𝐨 👥',
-        private: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐜𝐡𝐚𝐭 𝐩𝐫𝐢𝐯𝐚𝐭𝐚 👤',
+        private: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐧𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐜𝐡𝐚𝐭 𝐩𝐫𝐢𝐯𝐚𝐭𝐚 👤',
         admin: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐬𝐨𝐥𝐢 𝐚𝐝𝐦𝐢𝐧 👑',
         botAdmin: '𝐃𝐞𝐯𝐢 𝐝𝐚𝐫𝐞 𝐚𝐝𝐦𝐢𝐧 𝐚𝐥 𝐛𝐨𝐭 👑',
-        restrict: '🔐 𝐑𝐞𝐬𝐭𝐫𝐢𝐜𝐭 𝐞 𝐝𝐢𝐬𝐚𝐭𝐭𝐢𝐯𝐚𝐭𝐨 🔐'}[type]
+        restrict: '🔐 𝐑𝐞𝐬𝐭𝐫𝐢𝐜𝐭 𝐞 𝐝𝐢𝐬𝐚𝐭𝐭𝐢𝐯𝐨 🔐'}[type]
     if (msg) return conn.sendMessage(m.chat, { text: ' ', contextInfo:{
   "externalAdReply": {"title": `${msg}`, 
  "body": ``, 

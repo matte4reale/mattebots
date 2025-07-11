@@ -44,15 +44,16 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     "JadiBot": chat.jadibot,
     "SoloGruppo": chat.sologruppo,
     "SoloPrivato": chat.soloprivato,
-    "ModoAdmin": chat.modoadmin,
+    "soloadmin": chat.soloadmin,
     "BanGruppo": chat.isBanned,
     "Antiporno": chat.antiporno,
     "AntiCall": chat.antiCall,
     "Antiinsta": chat.antiinsta,
     "AntiTikTok": chat.antitiktok,
-    "Antiarab": chat.antiArab,
+    "Antipaki": chat.antiArab,
     "Antivirus": chat.antivirus,
     "Antibot": chat.antibot,
+    "Antivoip": chat.antivoip || false,
   };
 
   let statusList = Object.entries(functions)

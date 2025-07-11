@@ -2,6 +2,7 @@
 import axios from 'axios'
 import fs from 'fs'
 import path from 'path'
+
 function normalize(str) {
     if (!str) return '';
     str = str.split(/\s*[\(\[{](?:feat|ft|featuring).*$/i)[0]
@@ -14,14 +15,14 @@ function normalize(str) {
         .replace(/[^a-z0-9\s]/g, '')
         .trim();
 }
-async function getRandomItalianTrackFromItunes() {
+async function getRandomItalianTrackFromItunes(artist) {
     const keywords = [
        "Lazza", "Melons", "Sayf", "Sfera Ebbasta", "Ghali","Baby Gang", "Shiva", "Drake", "Tony Boy", "Kid Yugi", "21 savage", "Marracash", "Capo Plaza", "Guè Pequeno", "Melons", "King Von", "Chief Keef", "Lil Durk",  "Tha Supreme", "Gemitaiz", "Fabri Fibra", "Marracash", "Simba La Rue", "Il tre", "Rondo Da Sosa", "Drefgold", "Noyz Narcos", "Salmo", "Clementino", "Noyz Narcos", "Rocco Hunt", "Luchè",
     ]
     let found = null
     let tentativi = 0
     while (!found && tentativi < 5) {
-        const randomKeyword = keywords[Math.floor(Math.random() * keywords.length)]
+        const randomKeyword = artist ? artist : keywords[Math.floor(Math.random() * keywords.length)]
         const response = await axios.get('https://itunes.apple.com/search', {
             params: {
                 term: randomKeyword,
@@ -41,17 +42,78 @@ async function getRandomItalianTrackFromItunes() {
         preview: found.previewUrl
     }
 }
-const activeGames = new Map()
 
-let handler = async (m, { conn }) => {
+const activeGames = new Map()
+const pendingArtistChoice = new Map()
+
+let handler = async (m, { conn, args }) => {
     const chat = m.chat
-    
+
+    // Se l'utente deve ancora rispondere con il nome del cantante
+    if (pendingArtistChoice.has(chat) && !m.text.startsWith('.ic')) {
+        const artist = m.text.trim()
+        pendingArtistChoice.delete(chat)
+        return startGame(m, conn, chat, artist)
+    }
+
+    // Se c'è già una partita attiva
     if (activeGames.has(chat)) {
         return m.reply('『 ⚠️ 』- \`C\'è già una partita in corso in questo gruppo!\` ')
     }
 
+    // Primo livello: scelta modalità
+    if (!args[0]) {
+        await conn.sendMessage(m.chat, {
+            text: "Vuoi giocare con un cantante specifico o in generale?",
+            footer: "Scegli una modalità:",
+            buttons: [
+                { buttonId: '.ic generale', buttonText: { displayText: "🎲 Generale" }, type: 1 },
+                { buttonId: '.ic specifico', buttonText: { displayText: "🎤 Specifico" }, type: 1 }
+            ],
+            headerType: 1
+        }, { quoted: m })
+        return
+    }
+
+    // Secondo livello: scelta tra casuale o cantante specifico
+    if (args[0] === 'specifico' && !args[1]) {
+        await conn.sendMessage(m.chat, {
+            text: "Vuoi un cantante casuale o vuoi sceglierlo tu?",
+            footer: "Scegli una modalità:",
+            buttons: [
+                { buttonId: '.ic specifico casuale', buttonText: { displayText: "🎲 Casuale tra i famosi" }, type: 1 },
+                { buttonId: '.ic specifico scegli', buttonText: { displayText: "📝 Scegli cantante" }, type: 1 }
+            ],
+            headerType: 1
+        }, { quoted: m })
+        return
+    }
+
+    // Se si sceglie casuale tra i famosi
+    if (args[0] === 'specifico' && args[1] === 'casuale') {
+        return startGame(m, conn, chat)
+    }
+
+    // Se si sceglie di inserire un cantante
+    if (args[0] === 'specifico' && args[1] === 'scegli') {
+        pendingArtistChoice.set(chat, true)
+        await conn.sendMessage(m.chat, {
+            text: "Scrivi ora il nome del cantante con cui vuoi giocare.",
+            footer: "Esempio: Sfera Ebbasta",
+            headerType: 1
+        }, { quoted: m })
+        return
+    }
+
+    // Se si sceglie generale
+    if (args[0] === 'generale') {
+        return startGame(m, conn, chat)
+    }
+}
+
+async function startGame(m, conn, chat, artist = null) {
     try {
-        const track = await getRandomItalianTrackFromItunes()
+        const track = await getRandomItalianTrackFromItunes(artist)
         const audioResponse = await axios.get(track.preview, {
             responseType: 'arraybuffer'
         })
@@ -75,7 +137,6 @@ let handler = async (m, { conn }) => {
 ┃ \`Scrivi il titolo della canzone!\`
 ┃ \`vare ✧ bot\`
 ╰⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒`
-
         let gameMessage = await conn.reply(m.chat, formatGameMessage(30), m)
         let game = {
             track,
