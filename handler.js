@@ -518,16 +518,18 @@ export async function participantsUpdate({ id, participants, action }) {
                         let nomeDelBot = global.db.data.nomedelbot || `𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭`
                         text = (action === 'add' ? (chat.sWelcome || this.welcome || conn.welcome || 'Benvenuto, @user!').replace('@subject', await this.getName(id)).replace('@desc', groupMetadata.desc?.toString() || 'bot') :
                             (chat.sBye || this.bye || conn.bye || 'Addio, @user!')).replace('@user', '@' + user.split('@')[0])
-                        this.sendMessage(id, { 
+                        await this.sendMessage(id, { 
                             text: text, 
-                            contextInfo:{ 
-                                mentionedJid:[user],
+                            contextInfo: { 
+                                mentionedJid: [user],
                                 forwardingScore: 99,
                                 isForwarded: true, 
-                               forwardedNewsletterMessageInfo: {
-                               newsletterJid: '120363259442839354@newsletter',
-                               serverMessageId: '', newsletterName: `${nomeDelBot}` },
-                               externalAdReply: {
+                                forwardedNewsletterMessageInfo: {
+                                    newsletterJid: '120363259442839354@newsletter',
+                                    serverMessageId: '', 
+                                    newsletterName: `${nomeDelBot}` 
+                                },
+                                externalAdReply: {
                                     "title": `${action === 'add' ? '👋 Benvenuto!' : '👋 Addio!'}`, 
                                     "body": ``, 
                                     "previewType": "PHOTO",
@@ -537,14 +539,14 @@ export async function participantsUpdate({ id, participants, action }) {
                                 }
                             }
                         }) 
-                    } 
-                } 
+                    }
+                }
             }
-            break;
+            break
         case 'promote':
         case 'demote':
             // Disabilita i messaggi automatici per promozioni/demozioni
-            return;
+            return
     }
 }
             
