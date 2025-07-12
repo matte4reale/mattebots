@@ -492,10 +492,7 @@ remoteJid: m.chat, fromMe: false, id: bang, participant: cancellazzione
     }
 }
 
-/**
- * Handle groups participants update
- * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['group-participants.update']} groupsUpdate 
- */
+
 export async function participantsUpdate({ id, participants, action }) {
     if (opts['self'])
         return
@@ -531,18 +528,25 @@ export async function participantsUpdate({ id, participants, action }) {
                                newsletterJid: '120363259442839354@newsletter',
                                serverMessageId: '', newsletterName: `${nomeDelBot}` },
                                externalAdReply: {
-                                    "title": `${msg}`, 
- "body": ``, 
-  "previewType": "PHOTO",
-  "thumbnailUrl": ``, 
-  "thumbnail": apii.data,
-  "mediaType": 1
+                                    "title": `${action === 'add' ? '👋 Benvenuto!' : '👋 Addio!'}`, 
+                                    "body": ``, 
+                                    "previewType": "PHOTO",
+                                    "thumbnailUrl": ``, 
+                                    "thumbnail": apii.data,
+                                    "mediaType": 1
                                 }
                             }
                         }) 
                     } 
                 } 
             }
+            break;
+        case 'promote':
+        case 'demote':
+            // Disabilita i messaggi automatici per promozioni/demozioni
+            return;
+    }
+}
             
             if (chat.welcome) {
                 let groupMetadata = await this.groupMetadata(id) || (conn.chats[id] || {}).metadata
