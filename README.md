@@ -1,10 +1,10 @@
 
 
 <p align="center">
-  <img src="https://i.ibb.co/9mWwC5PP/Whats-App-Image-2025-07-06-at-23-32-06.jpg"  style="width: 100%; height: auto; max-width: 400px;">
+  <img src="https://i.ibb.co/6RMtRXW0/dragonball.jpg"  style="width: 100%; height: auto; max-width: 400px;">
 </p>
 
-<h1 align="center">© ChatUnity-Bot 6.0🤖</h1>
+<h1 align="center">© ChatUnity-Bot 5.3🤖</h1>
 <p align="center">
   <strong>Un bot avanzato per WhatsApp, ricco di funzionalità e divertimento!</strong>
 </p>
@@ -42,7 +42,7 @@
    termux-setup-storage
    ```
    ```bash
-   apt update -y && yes | apt upgrade && pkg install -y bash wget mpv && wget -O - https://raw.githubusercontent.com/chatunitycenter/chatunity-bot/main/chatunity.sh | bash
+   apt update -y && yes | apt upgrade && pkg install -y bash wget mpv && cd /sdcard && wget -O - https://raw.githubusercontent.com/chatunitycenter/chatunity-bot/main/chatunity.sh | bash
    ```
 ---
 
