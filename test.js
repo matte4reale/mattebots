@@ -49,12 +49,14 @@ let handler = async (m, { conn, command }) => {
 
     // Gestione comando scegli cantante
     if (command === 'sceglicantante') {
-        pendingArtist.set(chat, true)
-        return m.reply('Rispondi a questo messaggio con il nome del cantante che vuoi!')
+        // Salva l'id del messaggio a cui bisogna rispondere
+        let replyMsg = await m.reply('Rispondi a questo messaggio con il nome del cantante che vuoi!')
+        pendingArtist.set(chat, replyMsg.key.id)
+        return
     }
 
     // Se c'è una richiesta pendente di artista e l'utente risponde
-    if (pendingArtist.get(chat) && m.quoted && m.quoted.sender === conn.user.id) {
+    if (pendingArtist.has(chat) && m.quoted && m.quoted.id === pendingArtist.get(chat)) {
         const artistName = m.text?.trim()
         if (!artistName) return m.reply('Devi scrivere il nome di un cantante!')
         pendingArtist.delete(chat)
@@ -128,6 +130,8 @@ let handler = async (m, { conn, command }) => {
                         ],
                         headerType: 1
                     }).catch(() => {})
+                    
+                    
                     return
                 }
                 if (activeGames.has(chat)) {
