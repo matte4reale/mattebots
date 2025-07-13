@@ -17,9 +17,6 @@ const delay = ms => isNumber(ms) && new Promise(resolve => setTimeout(function (
     resolve()
 }, ms))
 
-// Stato chatbot privato per ogni utente
-global.privateChatbot = global.privateChatbot || {}
-
 /**
  * Handle messages upsert
  * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['messages.upsert']} groupsUpdate 
@@ -87,17 +84,17 @@ export async function handler(chatUpdate) {
                 if (!('antiviewonce' in chat)) chat.antiviewonce = false
                 if (!('antiTraba' in chat)) chat.antiTraba = true
                 if (!('antiArab' in chat)) chat.antiArab = false
-                if (!('soloadmin' in chat)) chat.soloadmin = false
+                if (!('modoadmin' in chat)) chat.modoadmin = false
                 if (!('antiporno' in chat)) chat.antiporno = true
                 if (!isNumber(chat.expired)) chat.expired = 0
                 if (!isNumber(chat.messaggi)) chat.messaggi = 0
                 if (!isNumber(chat.blasphemy)) chat.blasphemy = 0
                 if (!('name' in chat)) chat.name = m.name
                 if (!('name' in chat)) chat.name = this.getName(m.chat)
-                if (!('antivirus' in chat)) chat.antivirus = false; 
-                if (!('antispamcomandi' in chat)) chat.antispamcomandi = true;
-                if (!('antibestemmie' in chat)) chat.antibestemmie = false; 
-                if (!('antibot' in chat)) chat.antibot = false; 
+                if (!('antivirus' in chat)) chat.antivirus = false; // Aggiunto antivirus
+                if (!('antispamcomandi' in chat)) chat.antispamcomandi = true; // Attivo di default
+                if (!('antibestemmie' in chat)) chat.antibestemmie = false; // Attivo/disattivo anti bestemmie
+                if (!('antibot' in chat)) chat.antibot = false; // Disattivato di default
             } else
                 global.db.data.chats[m.chat] = {
                     name: this.getName(m.chat),
@@ -126,7 +123,7 @@ export async function handler(chatUpdate) {
                     antiToxic: false,
                     antiTraba: true,
                     antiArab: true,
-                    soloadmin: false,
+                    modoadmin: false,
                     antiPorno: true,
                     muto: false,
                     expired: 0,
@@ -304,7 +301,7 @@ export async function handler(chatUpdate) {
                         return
                 }
                 let hl = _prefix 
-                let adminMode = global.db.data.chats[m.chat].soloadmin
+                let adminMode = global.db.data.chats[m.chat].modoadmin
                 let mystica = `${plugin.botAdmin || plugin.admin || plugin.group || plugin || noPrefix || hl ||  m.text.slice(0, 1) == hl || plugin.command}`
                 if (adminMode && !isOwner && !isROwner && m.isGroup && !isAdmin && mystica) return   
 
@@ -434,6 +431,8 @@ export async function handler(chatUpdate) {
             if (quequeIndex !== -1)
                 this.msgqueque.splice(quequeIndex, 1)
         }
+        // conn.sendPresenceUpdate('composing', m.chat) 
+        //console.log(global.db.data.users[m.sender])
 let chat, user, stats = global.db.data.stats
 if (m) { let utente = global.db.data.users[m.sender];
 if (utente.muto == true) {
@@ -492,7 +491,10 @@ remoteJid: m.chat, fromMe: false, id: bang, participant: cancellazzione
     }
 }
 
-
+/**
+ * Handle groups participants update
+ * @param {import('@whiskeysockets/baileys').BaileysEventMap<unknown>['group-participants.update']} groupsUpdate 
+ */
 export async function participantsUpdate({ id, participants, action }) {
     if (opts['self'])
         return
@@ -518,35 +520,49 @@ export async function participantsUpdate({ id, participants, action }) {
                         let nomeDelBot = global.db.data.nomedelbot || `𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭`
                         text = (action === 'add' ? (chat.sWelcome || this.welcome || conn.welcome || 'Benvenuto, @user!').replace('@subject', await this.getName(id)).replace('@desc', groupMetadata.desc?.toString() || 'bot') :
                             (chat.sBye || this.bye || conn.bye || 'Addio, @user!')).replace('@user', '@' + user.split('@')[0])
-                        await this.sendMessage(id, { 
+                        this.sendMessage(id, { 
                             text: text, 
-                            contextInfo: { 
-                                mentionedJid: [user],
+                            contextInfo:{ 
+                                mentionedJid:[user],
                                 forwardingScore: 99,
                                 isForwarded: true, 
-                                forwardedNewsletterMessageInfo: {
-                                    newsletterJid: '120363259442839354@newsletter',
-                                    serverMessageId: '', 
-                                    newsletterName: `${nomeDelBot}` 
-                                },
-                                externalAdReply: {
-                                    "title": `${action === 'add' ? '👋 Benvenuto!' : '👋 Addio!'}`, 
-                                    "body": ``, 
-                                    "previewType": "PHOTO",
+                               forwardedNewsletterMessageInfo: {
+                               newsletterJid: '120363259442839354@newsletter',
+                               serverMessageId: '', newsletterName: `${nomeDelBot}` },
+                               externalAdReply: {
+                                    "title": `${action === 'add' ? '𝐌𝐞𝐬𝐬𝐚𝐠𝐠𝐢𝐨 𝐝𝐢 𝐛𝐞𝐧𝐯𝐞𝐧𝐭𝐨' : '𝐌𝐞𝐬𝐬𝐚𝐠𝐠𝐢𝐨 𝐝𝐢 𝐚𝐝𝐝𝐢𝐨'}`,
+                                    "previewType": "PHOTO", 
                                     "thumbnailUrl": ``, 
                                     "thumbnail": apii.data,
                                     "mediaType": 1
                                 }
                             }
                         }) 
-                    }
-                }
+                    } 
+                } 
             }
-            break
+            
+            if (chat.welcome) {
+                let groupMetadata = await this.groupMetadata(id) || (conn.chats[id] || {}).metadata
+                for (let user of participants) {
+                    let pp = fs.readFileSync('./src/profilo.png')
+                    try {
+                        pp = await this.profilePictureUrl(user, 'image')
+                    } catch (e) {
+                    } finally {
+                        let nomeDelBot = global.db.data.nomedelbot || `𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭`
+                        let apii = await this.getFile(pp)
+                      
+                                
+                            
+                    } 
+                } 
+            }
+            break;
         case 'promote':
         case 'demote':
             // Disabilita i messaggi automatici per promozioni/demozioni
-            return
+            return; // Aggiunto return per evitare l'invio di messaggi
     }
 }
 
@@ -605,34 +621,10 @@ global.dfail = (type, m, conn) => {
         mods: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐥𝐨 𝐩𝐨𝐬𝐬𝐨𝐧𝐨 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐞 𝐬𝐨𝐥𝐨 𝐚𝐝𝐦𝐢𝐧 𝐞 𝐨𝐰𝐧𝐞𝐫 ⚙️',
         premium: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐦𝐞𝐦𝐛𝐫𝐢 𝐩𝐫𝐞𝐦𝐢𝐮𝐦 ✅',
         group: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐮𝐧 𝐠𝐫𝐮𝐩𝐩𝐨 👥',
-        private: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐧𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐜𝐡𝐚𝐭 𝐩𝐫𝐢𝐯𝐚𝐭𝐚 👤',
+        private: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐜𝐡𝐚𝐭 𝐩𝐫𝐢𝐯𝐚𝐭𝐚 👤',
         admin: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐬𝐨𝐥𝐢 𝐚𝐝𝐦𝐢𝐧 👑',
         botAdmin: '𝐃𝐞𝐯𝐢 𝐝𝐚𝐫𝐞 𝐚𝐝𝐦𝐢𝐧 𝐚𝐥 𝐛𝐨𝐭 👑',
-        restrict: '🔐 𝐑𝐞𝐬𝐭𝐫𝐢𝐜𝐭 𝐞 𝐝𝐢𝐬𝐚𝐭𝐭𝐢𝐯𝐨 🔐'}[type]
-    if (msg) return conn.sendMessage(m.chat, { text: ' ', contextInfo:{
-  "externalAdReply": {"title": `${msg}`, 
- "body": ``, 
-  "previewType": "PHOTO",
-  "thumbnail": fs.readFileSync('./accessdenied2.png'),
-  "mediaType": 1,
-  "renderLargerThumbnail": true}}}, {quoted: m})
-}
-let file = global.__filename(import.meta.url, true)
-watchFile(file, async () => {
-    unwatchFile(file)
-    console.log(chalk.redBright("Update 'handler.js'"))
-    if (global.reloadHandler) console.log(await global.reloadHandler())
-})
-    let msg = {
-        rowner: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐬𝐨𝐥𝐨 𝐩𝐞𝐫 𝐨𝐰𝐧𝐞𝐫 🕵🏻‍♂️',
-        owner: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐬𝐨𝐥𝐨 𝐩𝐞𝐫 𝐨𝐰𝐧𝐞𝐫 🕵🏻‍♂️',
-        mods: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐥𝐨 𝐩𝐨𝐬𝐬𝐨𝐧𝐨 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐞 𝐬𝐨𝐥𝐨 𝐚𝐝𝐦𝐢𝐧 𝐞 𝐨𝐰𝐧𝐞𝐫 ⚙️',
-        premium: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐦𝐞𝐦𝐛𝐫𝐢 𝐩𝐫𝐞𝐦𝐢𝐮𝐦 ✅',
-        group: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐮𝐧 𝐠𝐫𝐮𝐩𝐩𝐨 👥',
-        private: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐩𝐮𝐨𝐢 𝐮𝐭𝐢𝐥𝐢𝐧𝐢𝐳𝐳𝐚𝐫𝐥𝐨 𝐢𝐧 𝐜𝐡𝐚𝐭 𝐩𝐫𝐢𝐯𝐚𝐭𝐚 👤',
-        admin: '𝐐𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐞̀ 𝐩𝐞𝐫 𝐬𝐨𝐥𝐢 𝐚𝐝𝐦𝐢𝐧 👑',
-        botAdmin: '𝐃𝐞𝐯𝐢 𝐝𝐚𝐫𝐞 𝐚𝐝𝐦𝐢𝐧 𝐚𝐥 𝐛𝐨𝐭 👑',
-        restrict: '🔐 𝐑𝐞𝐬𝐭𝐫𝐢𝐜𝐭 𝐞 𝐝𝐢𝐬𝐚𝐭𝐭𝐢𝐯𝐨 🔐'}[type]
+        restrict: '🔐 𝐑𝐞𝐬𝐭𝐫𝐢𝐜𝐭 𝐞 𝐝𝐢𝐬𝐚𝐭𝐭𝐢𝐯𝐚𝐭𝐨 🔐'}[type]
     if (msg) return conn.sendMessage(m.chat, { text: ' ', contextInfo:{
   "externalAdReply": {"title": `${msg}`, 
  "body": ``, 
