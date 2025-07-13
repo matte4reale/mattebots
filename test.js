@@ -42,14 +42,30 @@ async function getRandomItalianTrackFromItunes() {
     }
 }
 const activeGames = new Map()
+const pendingArtist = new Map()
 
-let handler = async (m, { conn }) => {
+let handler = async (m, { conn, command }) => {
     const chat = m.chat
-    
-    if (activeGames.has(chat)) {
-        return m.reply('『 ⚠️ 』- \`C\'è già una partita in corso in questo gruppo!\` ')
+
+    // Gestione comando scegli cantante
+    if (command === 'sceglicantante') {
+        pendingArtist.set(chat, true)
+        return m.reply('Rispondi a questo messaggio con il nome del cantante che vuoi!')
     }
 
+    // Se c'è una richiesta pendente di artista e l'utente risponde
+    if (pendingArtist.get(chat) && m.quoted && m.quoted.sender === conn.user.id) {
+        const artistName = m.text?.trim()
+        if (!artistName) return m.reply('Devi scrivere il nome di un cantante!')
+        pendingArtist.delete(chat)
+        return startGameWithArtist(m, conn, artistName)
+    }
+
+    if (activeGames.has(chat)) {
+        return m.reply('『 ⚠️ 』- `C\'è già una partita in corso in questo gruppo!` ')
+    }
+
+    // Avvio normale (random)
     try {
         const track = await getRandomItalianTrackFromItunes()
         const audioResponse = await axios.get(track.preview, {
@@ -132,6 +148,99 @@ let handler = async (m, { conn }) => {
         activeGames.delete(chat)
     }
 }
+
+// Funzione per avviare il gioco con artista scelto
+async function startGameWithArtist(m, conn, artistName) {
+    const chat = m.chat
+    if (activeGames.has(chat)) {
+        return m.reply('『 ⚠️ 』- `C\'è già una partita in corso in questo gruppo!` ')
+    }
+    try {
+        const response = await axios.get('https://itunes.apple.com/search', {
+            params: {
+                term: artistName,
+                country: 'IT',
+                media: 'music',
+                limit: 20
+            }
+        })
+        const valid = response.data.results.filter(b => b.previewUrl && b.trackName && b.artistName)
+        if (!valid.length) throw new Error('Nessuna canzone trovata per questo artista.')
+        const found = valid[Math.floor(Math.random() * valid.length)]
+        const track = {
+            title: found.trackName,
+            artist: found.artistName,
+            preview: found.previewUrl
+        }
+        const audioResponse = await axios.get(track.preview, { responseType: 'arraybuffer' })
+        const tmpDir = path.join(process.cwd(), 'tmp')
+        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true })
+        const audioPath = path.join(tmpDir, `song_${Date.now()}.mp3`)
+        fs.writeFileSync(audioPath, Buffer.from(audioResponse.data))
+        await conn.sendMessage(m.chat, { 
+            audio: fs.readFileSync(audioPath),
+            mimetype: 'audio/mp4',
+            ptt: true
+        }, { quoted: m })
+        fs.unlinkSync(audioPath)
+        const formatGameMessage = (timeLeft) => `
+ ⋆｡˚『 ╭ \`INDOVINA CANZONE\` ╯ 』˚｡⋆\n╭\n│
+┃ 『 ⏱️ 』 \`Tempo:\` *${timeLeft} secondi* 
+┃ 『 👤 』 \`Artista:\` *${track.artist}* 
+┃
+┃ \`Scrivi il titolo della canzone!\`
+┃ \`vare ✧ bot\`
+╰⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒─ׄ─ׅ─ׄ─⭒`
+        let gameMessage = await conn.reply(m.chat, formatGameMessage(30), m)
+        let game = {
+            track,
+            timeLeft: 30,
+            message: gameMessage,
+            interval: null
+        }
+        game.interval = setInterval(async () => {
+            try {
+                game.timeLeft -= 5
+                if (game.timeLeft <= 0) {
+                    clearInterval(game.interval)
+                    activeGames.delete(chat)
+                    await conn.sendMessage(m.chat, { delete: gameMessage.key }).catch(() => {})
+                    await conn.sendMessage(m.chat, {
+                        text: `
+ㅤㅤ⋆｡˚『 ╭ \`TEMPO SCADUTO\` ╯ 』˚｡⋆\n╭\n│
+│ ➤ \`Nessuno ha indovinato!\`
+┃ 『  』🎵 \`Titolo:\` *${track.title}*
+┃ 『  』👤 \`Artista:\` *${track.artist}*
+┃
+╰⭒─ׄ─ׅ─ׄ─⭒`,
+                        buttons: [
+                            {
+                                buttonId: '.ic',
+                                buttonText: { displayText: '『 🎵 』 Rigioca' },
+                                type: 1
+                            }
+                        ],
+                        headerType: 1
+                    }).catch(() => {})
+                    return
+                }
+                if (activeGames.has(chat)) {
+                    await conn.sendMessage(m.chat, {
+                        text: formatGameMessage(game.timeLeft),
+                        edit: gameMessage.key
+                    }).catch(() => {})
+                }
+            } catch (e) {
+                console.error('Errore nel countdown:', e)
+            }
+        }, 5000)
+        activeGames.set(chat, game)
+    } catch (e) {
+        m.reply('Errore nel trovare la canzone per questo artista.')
+        activeGames.delete(chat)
+    }
+}
+
 handler.before = async (m, { conn }) => {
     const chat = m.chat
     
@@ -218,9 +327,9 @@ handler.before = async (m, { conn }) => {
     }
 }
 
-handler.help = ['indovinacanzone']
+handler.help = ['indovinacanzone', 'sceglicantante']
 handler.tags = ['giochi']
-handler.command = ['indovinacanzone', 'ic']
+handler.command = ['indovinacanzone', 'ic', 'sceglicantante']
 handler.register = true
 
 export default handler
