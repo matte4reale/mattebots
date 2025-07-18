@@ -2,8 +2,12 @@
 
 export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isROwner }) {
   let message = "";
-  for (const [ownerNumber] of global.owner) {
-    message += `\n> 📞+${ownerNumber}`;
+  if (Array.isArray(global.owner)) {
+    for (const ownerEntry of global.owner) {
+      // Support both array-of-arrays and array-of-strings
+      let ownerNumber = Array.isArray(ownerEntry) ? ownerEntry[0] : ownerEntry;
+      if (ownerNumber) message += `\n> 📞+${ownerNumber}`;
+    }
   }
   if (m.isBaileys && m.fromMe) return true;
   if (m.isGroup) return false;

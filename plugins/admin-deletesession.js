@@ -9,6 +9,10 @@ const handler = async (message, { conn, usedPrefix }) => {
     }, { quoted: message });
   }
 
+  await conn.sendMessage(message.chat, {
+    text: "⚡️ 𝐑𝐢𝐩𝐫𝐢𝐬𝐭𝐢𝐧𝐨 𝐝𝐞𝐥𝐥𝐞 𝐬𝐞𝐬𝐬𝐢𝐨𝐧𝐢 𝐢𝐧 𝐜𝐨𝐫𝐬𝐨... ⏳"
+  }, { quoted: message });
+
   try {
     const sessionFolder = "./Sessioni/";
 
@@ -30,7 +34,7 @@ const handler = async (message, { conn, usedPrefix }) => {
 
     const responseText = deletedCount === 0
       ? "❗ 𝐋𝐞 𝐬𝐞𝐬𝐬𝐢𝐨𝐧𝐢 𝐬𝐨𝐧𝐨 𝐯𝐮𝐨𝐭𝐞 ‼️"
-      : `🔥 𝐒𝐨𝐧𝐨 𝐬𝐭𝐚𝐭𝐢 𝐞𝐥𝐢𝐦𝐢𝐧𝐚𝐭𝐢 ${deletedCount} 𝐚𝐫𝐜𝐡𝐢𝐯𝐢 𝐝𝐞𝐥𝐥𝐞 𝐬𝐞𝐬𝐬𝐢𝐨𝐧𝐢!`;
+      : `🔥 𝐒𝐨𝐧𝐨 𝐞𝐥𝐢𝐦𝐢𝐧𝐚𝐭𝐢 ${deletedCount} 𝐚𝐫𝐜𝐡𝐢𝐯𝐢 𝐝𝐞𝐥𝐥𝐞 𝐬𝐞𝐬𝐬𝐢𝐨𝐧𝐢!`;
 
     await conn.sendMessage(message.chat, { text: responseText }, { quoted: message });
 
@@ -49,12 +53,16 @@ const handler = async (message, { conn, usedPrefix }) => {
     message: {
       locationMessage: {
         name: botName,
-        jpegThumbnail: Buffer.from(await (await fetch("https://qu.ax/cSqEs.jpg")).arrayBuffer()),
+        jpegThumbnail: await (await fetch("https://qu.ax/cSqEs.jpg")).buffer(),
         vcard: "BEGIN:VCARD\nVERSION:3.0\nN:;Unlimited;;;\nFN:Unlimited\nORG:Unlimited\nTITLE:\nitem1.TEL;waid=19709001746:+1 (970) 900-1746\nitem1.X-ABLabel:Unlimited\nX-WA-BIZ-DESCRIPTION:ofc\nX-WA-BIZ-NAME:Unlimited\nEND:VCARD"
       }
     },
     participant: '0@s.whatsapp.net'
   };
+
+  await conn.sendMessage(message.chat, {
+    text: "💌 𝐎𝐫𝐚 𝐬𝐚𝐫𝐚𝐢 𝐢𝐧 𝐠𝐫𝐚𝐝𝐨 𝐝𝐢 𝐥𝐞𝐠𝐠𝐞𝐫𝐞 𝐢 𝐦𝐞𝐬𝐬𝐚𝐠𝐠𝐢 𝐝𝐞𝐥 𝐛𝐨𝐭 🚀"
+  }, { quoted: quotedMessage });
 };
 
 handler.help = ['del_reg_in_session_owner'];
